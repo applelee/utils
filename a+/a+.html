@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    .xixi {
+      width: 600px;height: 600px;background-color: white;border: 1px solid black;position: relative;border-width: 1px 0 0 1px;
+    }
+    .xixi div {
+      width: 40px;
+      height: 40px;
+      border: 1px solid black;
+      border-width: 0 1px 1px 0;
+      position: absolute;
+      font-size: 12px;
+      color: #333;
+    }
+  </style>
+  <body>
+    <div id='container' class='xixi'></div>
+  </body>
+  <script src='../libs/APF.js'></script>
+  <script src='../libs/noise.js'></script>
+  <script>
+    const box = document.getElementById('container');
+    const box_w = box_h = 600;
+    const el_w = el_h = 40;
+    const col = box_w / el_w;
+    const row = box_h / el_h;
+    const children = [];
+    const obstacles = [];
+    let start = [];
+    let end = [];
+    let clickCount = 0;
+
+    const apf = new APF({
+      screenMaxX: col,
+      screenMaxY: row,
+      // isAsterisk: true,
+      // maxLoop: 3
+    });
+
+    const clickFn = function () {
+      clickCount += 1;
+
+      if (clickCount === 1) {
+        start = [Number(this.getAttribute('x')), Number(this.getAttribute('y'))];
+      } else if (clickCount === 2) {
+        clickCount = 0;
+        end = [Number(this.getAttribute('x')), Number(this.getAttribute('y'))];
+        colorFn(apf.getRoute({
+          startVector: start,
+          endVector: end,
+          obstacles,
+        }));
+      }
+    }
+
+    for (let i = 0; i < row; i ++) {
+      for (let j = 0; j < col; j ++) {
+        const element = document.createElement('div');
+        // 柏林2维噪声函数 生成伪随机数
+        const randomNum = (noise.perlin2(j/16, i/16) * 88716321) & 7;
+        
+        element.setAttribute('x', j);
+        element.setAttribute('y', i);
+        element.setAttribute('id', `${j}_${i}`);
+        element.setAttribute('style', `left: ${j * el_w}px;top: ${i * el_h}px`);
+        // 显示矢量
+        // element.textContent = `${j}, ${i}`;
+        if (randomNum > 5) {
+          obstacles.push([j, i]);
+          element.style.background = '#666';
+        }
+        box.appendChild(element);
+
+        element.addEventListener('click', clickFn);
+      }
+    }
+
+    const colorFn = route => {
+      console.log(route.length);
+      if (route.length < 1) alert('path is nothing!');
+      const rgba = ramdomRGBA();
+      const loop = (r = route) => {
+        const vector = r.shift();
+        if (!vector) return;
+
+        const el = document.getElementById(`${vector[0]}_${vector[1]}`);
+        el.style.background = rgba;
+        setTimeout(() => loop(r), 100)
+      }
+
+      loop();
+    }
+
+    const ramdomRGBA = () => {
+      const num = 4938112;
+      return `rgba(${(Math.random() * num) & 255}, ${(Math.random() * num) & 255}, ${(Math.random() * num) & 255}, 1)`;
+    }
+  </script>
+</html>
