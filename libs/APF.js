@@ -6,7 +6,7 @@
       endVector: [1, 1],                // 结束矢量
       screenMaxX: 1,                    // 场景最大横坐标
       screenMaxY: 1,                    // 场景最大纵坐标
-      obstacles: [[1, 1]],              // 障碍矢量集合
+      obstacles: [],                    // 障碍矢量集合
       maxLoop: 1000,                    // 最大循环次数（防止死循环与内存溢出）
       ...opt,
     }
