@@ -53,6 +53,11 @@
     return this.__getOnceRoute__();
   }
 
+  // 返回探索过的格子
+  APF.prototype.getSolve = function () {
+    return this.solve;
+  }
+
   // 循环计算
   APF.prototype.__calculationRoute__ = function () {
     while (this.resultRoute.length < 1 && this.loopCount < this.maxLoop) {
@@ -67,16 +72,14 @@
     const route = [...value];
     const len = route.length;
     const vector = route[len - 1];
-
-    // 当前路径进入死胡同
-    if (len < 1) {
-      this.branchs.delete(key);
-      return;
-    };
-
     const directions = this.directions;
-    let nextVector;
-    let prevDistance;
+    const nextVectors = [];
+
+    // 当前路径是否到达终点
+    if (vector && this.__isOver__(vector)) {
+      this.resultRoute.push(route);
+      return;
+    }
 
     // 方向矢量校验
     for (let i = 0; i < directions.length; i ++) {
@@ -84,30 +87,24 @@
 
       // 检测场景溢出、已解决、障碍物
       if (this.__isOverflow__(newVector) || this.__isSolve__(newVector) || this.__isObstacle__(newVector)) continue;
-      
-      const distance = this.__getDistance__(newVector);
-      if ((!prevDistance && prevDistance !== 0) || prevDistance > distance) {
-        prevDistance = distance;
-        nextVector = newVector;
-      } else if (prevDistance === distance) {
-        // 产生分支
-        const newRoute = [...route];
-        newRoute.push(newVector);
-        this.solve.add(vectorTransformString(newVector));
-        this.branchs.set(vectorTransformString(newVector), newRoute);
-      }
+
+      nextVectors.push(newVector);
     }
 
-    // 下一步矢量校验失败
-    if (!nextVector) route.pop();
-    else {
-      this.solve.add(vectorTransformString(nextVector));
-      route.push(nextVector);
-    }
+    // 无法生成新的分支，删除当前分支
+    if (nextVectors.length < 1) {
+      this.branchs.delete(key);
+      return
+    };
 
-    this.branchs.set(key, [...route]);
-    // 当前路径是否到达终点
-    if (nextVector && this.__isOver__(nextVector)) this.resultRoute.push(route);
+    // 生成分支
+    nextVectors.forEach((v, i) => {
+      const newRoute = [...route];
+      const newKey = vectorTransformString(v);
+      newRoute.push(v);
+      this.solve.add(newKey);
+      this.branchs.set(i === 0 ? key : newKey, newRoute);
+    });
   }
 
   // 重新计算方向集
@@ -127,17 +124,7 @@
 
   // 随机获取一条已经完成的路径（最短路径，通常会有多条）
   APF.prototype.__getOnceRoute__ = function () {
-    console.log(this.resultRoute.length)
     return this.resultRoute.length < 1 ? [] : this.resultRoute[((Math.random() * 957831) >> 0) % this.resultRoute.length];
-  }
-
-  // 计算距离
-  APF.prototype.__getDistance__ = function (vector) {
-    const x = Math.abs(this.endVector[0] - vector[0]);
-    const y = Math.abs(this.endVector[1] - vector[1]);
-
-    if (!this.isAsterisk) return Math.abs(x) + Math.abs(y);
-    else return x >= y ? x : y;
   }
   
   // 是否为障碍
@@ -166,14 +153,6 @@
 
   // 矢量转换成字符串
   const vectorTransformString = vector => `${vector[0]}_${vector[1]}`;
-  // 字符串转换矢量
-  const stringTransformVector = s => {
-    const vector = s.split('_');
-
-    vector[0] = Number(vector[0]);
-    vector[1] = Number(vector[1]);
-    return vector;
-  }
 
   w.APF = APF;
 })(window)
