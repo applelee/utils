@@ -18,11 +18,13 @@
     // 路径分支栈（重点）
     this.branchs = [];
     // 已解决掉的矢量（重点）
-    this.solve = new Set;
+    this.solve = new Set();
     // 结果（2维数组）
     this.resultRoute = [];
     // 已经循环的次数
     this.loopCount = 0;
+    // 走入死胡同的分支
+    this.deadBrach = new Set();
   }
 
   // 初始化
@@ -39,8 +41,8 @@
     this.directions = this.__getDirections__();
     this.obstacles = new Set(this.options.obstacles.map(v => vectorTransformString(v)));
     this.solve = new Set([vectorTransformString(this.startVector)]);
-    this.branchs = new Map;
-    this.branchs.set(vectorTransformString(this.startVector), [this.startVector]);
+    this.branchs = new Map([[vectorTransformString(this.startVector), [this.startVector]]]);
+    this.deadBrach = new Set();
     this.resultRoute = [];
     this.maxLoop = this.options.maxLoop;
     this.loopCount = 0;
@@ -53,16 +55,21 @@
     return this.__getOnceRoute__();
   }
 
-  // 返回探索过的格子
+  // 获取探索过的格子
   APF.prototype.getSolve = function () {
     return this.solve;
+  }
+
+  // 获取所有分支
+  APF.prototype.getBranchs = function () {
+    return this.branchs;
   }
 
   // 循环计算
   APF.prototype.__calculationRoute__ = function () {
     while (this.resultRoute.length < 1 && this.loopCount < this.maxLoop) {
       const branchs = new Map([...this.branchs]);
-      branchs.forEach((v, k) => this.__onceHandle__(v, k));
+      branchs.forEach((v, k) => (!this.deadBrach.has(k) && this.__onceHandle__(v, k)));
       this.loopCount ++;
     }
   }
@@ -76,8 +83,8 @@
     const nextVectors = [];
 
     // 当前路径是否到达终点
-    if (vector && this.__isOver__(vector)) {
-      this.resultRoute.push(route);
+    if (this.__isOver__(vector)) {
+      this.resultRoute.push([...route]);
       return;
     }
 
@@ -91,9 +98,10 @@
       nextVectors.push(newVector);
     }
 
-    // 无法生成新的分支，删除当前分支
+    // 宣告此分支死亡
     if (nextVectors.length < 1) {
-      this.branchs.delete(key);
+      // this.branchs.delete(key);
+      this.deadBrach.add(key);
       return
     };
 

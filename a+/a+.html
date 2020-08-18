@@ -113,6 +113,39 @@
       loop();
     }
 
+    // const colorFn = route => {
+    //   if (route.length < 1) alert('path is nothing!');
+    //   const rgba = ramdomRGBA();
+    //   const arr = [...apf.getBranchs().values()];
+    //   const colors = [];
+    //   arr.forEach((v, i) => {
+    //     colors[i] = ramdomRGBA();
+    //   });
+    //   let count = 1;
+
+    //   const loop = (r = route) => {
+    //     for (let i = 0; i < arr.length; i ++) {
+    //       const branch = arr[i];
+    //       const vector = branch.shift();
+
+    //       if (!vector) continue;
+
+    //       const el = document.getElementById(`${vector[0]}_${vector[1]}`);
+    //       el.style.background = colors[i];
+    //     }
+
+    //     const vector = r.shift();
+    //     if (!vector) return;
+    //     const el = document.getElementById(`${vector[0]}_${vector[1]}`);
+    //     el.style.background = rgba;
+    //     document.getElementById('text').innerText = count;
+    //     count ++;
+    //     setTimeout(() => loop(r), 100);
+    //   }
+
+    //   loop();
+    // }
+
     const ramdomRGBA = () => {
       const num = 4938112;
       return `rgba(${(Math.random() * num) & 255}, ${(Math.random() * num) & 255}, ${(Math.random() * num) & 255}, 1)`;
