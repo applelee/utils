@@ -1,34 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-    #text {
-      font-size: 16px;
-      color: #333;
-      position: fixed;
-      right: 10px;
-      bottom: 10px;
-    }
-    .xixi {
-      width: 600px;height: 600px;background-color: white;border: 1px solid black;position: relative;border-width: 1px 0 0 1px;
-    }
-    .xixi div {
-      width: 40px;
-      height: 40px;
-      border: 1px solid black;
-      border-width: 0 1px 1px 0;
-      position: absolute;
-      font-size: 12px;
-      color: #333;
-    }
+    * {box-sizing: border-box;}
+    #text {font-size: 20px;color: #333;margin-top: 10px;}
+    .xixi {width: 600px;height: 600px;background-color: white;border: 1px solid black;position: relative;border-width: 1px 0 0 1px;}
+    .xixi div {width: 40px;height: 40px;border: 1px solid black;border-width: 0 1px 1px 0;position: absolute;font-size: 12px;color: #333;cursor: pointer;}
+    .xixi div:hover{opacity: 0.8;}
   </style>
   <body>
     <div id='container' class='xixi'></div>
     <div id='text'></div>
   </body>
-  <script src='../libs/APF.js'></script>
+  <script src='../libs/AStarPath.js'></script>
   <script>
     const box = document.getElementById('container');
     const box_w = box_h = 600;
@@ -41,41 +24,27 @@
     let end = [];
     let clickCount = 0;
 
-    const apf = new APF({
-      screenMaxX: col,
-      screenMaxY: row,
-      // isAsterisk: true,
-      // maxLoop: 3
-    });
-
-    const clickFn = function () {
-      clickCount += 1;
-
-      if (clickCount === 1) {
-        start = [Number(this.getAttribute('x')), Number(this.getAttribute('y'))];
-      } else if (clickCount === 2) {
-        clickCount = 0;
-        end = [Number(this.getAttribute('x')), Number(this.getAttribute('y'))];
-        colorFn(apf.getRoute({
-          startVector: start,
-          endVector: end,
-          obstacles,
-        }));
-      }
+    const options = {
+      screenSize: [col, row],
+      // isAstar: true,       // 是否开启 *
     }
 
+    // 生成格子
     for (let i = 0; i < row; i ++) {
       for (let j = 0; j < col; j ++) {
         const element = document.createElement('div');
-        // 柏林2维噪声函数 生成伪随机数
+        // 生成 0 - 7 随机数
         const randomNum = Math.random() * 834819 & 7;
         
         element.setAttribute('x', j);
         element.setAttribute('y', i);
         element.setAttribute('id', `${j}_${i}`);
         element.setAttribute('style', `left: ${j * el_w}px;top: ${i * el_h}px`);
-        // 显示矢量
-        element.textContent = `${j}, ${i}`;
+
+        // 显示格子的矢量
+        // element.textContent = `${j}, ${i}`;
+
+        // 生成障碍物
         if (randomNum > 5) {
           obstacles.push([j, i]);
           element.style.background = '#666';
@@ -86,18 +55,16 @@
       }
     }
 
-    const colorFn = route => {
+    // const ASP = new AStarPath(options); 创建实例
+    const ASP = AStarPath.create({
+      ...options,
+      obstacles,
+    })
+
+    const pathFillColor = route => {
       if (route.length < 1) alert('path is nothing!');
       const rgba = ramdomRGBA();
-      const other = ramdomRGBA();
-      const arr = [...apf.getSolve()].map(v => v.split('_'));
       let count = 1;
-
-      for (let i = 0; i < arr.length; i ++) {
-        const vector = arr[i];
-        const el = document.getElementById(`${vector[0]}_${vector[1]}`);
-        el.style.background = other;
-      }
 
       const loop = (r = route) => {
         const vector = r.shift();
@@ -113,41 +80,33 @@
       loop();
     }
 
-    // const colorFn = route => {
-    //   if (route.length < 1) alert('path is nothing!');
-    //   const rgba = ramdomRGBA();
-    //   const arr = [...apf.getBranchs().values()];
-    //   const colors = [];
-    //   arr.forEach((v, i) => {
-    //     colors[i] = ramdomRGBA();
-    //   });
-    //   let count = 1;
+    ASP.onPath(({ path }) => {
+      if (path.length < 1) alert('path is not exsit!');
+      pathFillColor(path);
+    });
 
-    //   const loop = (r = route) => {
-    //     for (let i = 0; i < arr.length; i ++) {
-    //       const branch = arr[i];
-    //       const vector = branch.shift();
+    function clickFn () {
+      clickCount += 1;
 
-    //       if (!vector) continue;
+      // 获取两个格子的间的最短路径
+      if (clickCount === 1) {
+        startVector = [Number(this.getAttribute('x')), Number(this.getAttribute('y'))];
+      } else if (clickCount === 2) {
+        clickCount = 0;
+        endVector = [Number(this.getAttribute('x')), Number(this.getAttribute('y'))];
 
-    //       const el = document.getElementById(`${vector[0]}_${vector[1]}`);
-    //       el.style.background = colors[i];
-    //     }
-
-    //     const vector = r.shift();
-    //     if (!vector) return;
-    //     const el = document.getElementById(`${vector[0]}_${vector[1]}`);
-    //     el.style.background = rgba;
-    //     document.getElementById('text').innerText = count;
-    //     count ++;
-    //     setTimeout(() => loop(r), 100);
-    //   }
-
-    //   loop();
-    // }
+        /**
+         * 可以用 ASP.getPath(opt)直接获取路径
+         */
+        ASP.run({
+          startVector,
+          endVector,
+        })
+      }
+    }
 
     const ramdomRGBA = () => {
-      const num = 4938112;
+      const num = 1 << 10;
       return `rgba(${(Math.random() * num) & 255}, ${(Math.random() * num) & 255}, ${(Math.random() * num) & 255}, 1)`;
     }
   </script>
