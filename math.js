@@ -115,23 +115,28 @@ const dotProduct = (v1, v2) => {
 
 /**
  * 
- * 矢量旋转
- * @param {array} vector 矢量
+ * 矩阵相乘
+ * @param {array} matrix1 2d矩阵
  * @param {array} maxtix2d 2d矩阵
- * @returns {array} 旋转后的矢量矢量
+ * @returns {array} 新的矩阵
  */
-const vectorRotation = (vector, maxtix2d) => {
-  const row = maxtix2d.length;
-  const col = maxtix2d[0].length;
-  const newVector = [];
+const matrixMultiplication = (matrix1, matrix2) => {
+  const row1 = matrix1.length;
+  const row2 = matrix2.length;
+  const col2 = matrix2[0].length;
+  const newMatirx = [];
 
-  for (let j = 0; j < col; j ++) {
-    const tampVector = [];
-    for (let k = 0; k < row; k ++) {
-      tampVector.push(maxtix2d[k][j]);
+  for (let z = 0; z < row1; z ++) {
+    newMatirx[z] = [];
+
+    for (let x = 0; x < col2; x ++) {
+      const tampVector = [];
+      for (let y = 0; y < row2; y ++) {
+        tampVector.push(matrix2[y][x]);
+      }
+      newMatirx[z].push(dotProduct(matrix1[z], tampVector));
     }
-    newVector.push(dotProduct(vector, tampVector));
   }
 
-  return newVector;
+  return newMatirx;
 };
