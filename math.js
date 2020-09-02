@@ -83,15 +83,16 @@ const matirx2dRotation = (matrix2d, clockwise = true) => {
  * @param {boolean} clockwise 是否顺时针
  * @returns {array} 2d矩阵（2维数组）
  */
-const matrix2dZ = (angle, clockwise = true) => {
+const matrix2dZ = (angle, clockwise = true, move = [0, 0]) => {
   const radian = angle * Math.PI / 180;
   const cos = () => Math.abs(angle % 180) === 90 ? 0 : Math.cos(radian);
   const sin = () => Math.sin(radian);
+  const [x, y] = move
   
   return [
     [cos(), clockwise ? -sin() : sin(), 0],
     [clockwise ? sin() : -sin(), cos(), 0],
-    [0, 0, 1],
+    [x, y, 1],
   ];
 };
 
