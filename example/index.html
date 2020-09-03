@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <script src="../libs/BinaryTree.js"></script>
+    <script>
+      const arr = [8,55,12,75,0,12,1,8,2,33];
+      const temp = [222,566,-12];
+      const binaryTree = new BinaryTree(arr);
+      console.log(binaryTree);
+      
+      temp.forEach(v => binaryTree.add(v));
+      console.log(binaryTree.rootTree);
+      console.log(binaryTree.min());
+      console.log(binaryTree.max());
+      console.log(binaryTree.has(725), binaryTree.has(8), binaryTree.has(55), binaryTree.has(1222));
+
+      // 清空二叉树
+      // binaryTree.clear();
+      // console.log(binaryTree.rootTree);
+    </script>
+  </head>
+  <body>
+
+  </body>
+</html>
