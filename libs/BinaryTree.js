@@ -111,7 +111,6 @@
       tempTree = minTree(tree.leftTree);
     } else {
       delete tree.value;
-      console.log('ok');
       return true;
     }
     tree.value = tempTree.value;
