@@ -36,15 +36,15 @@
   } 
 
   BinaryTree.prototype.min = function () {
-    return minValue().value;
+    return minTree().value;
   }
 
   BinaryTree.prototype.max = function () {
-    return maxValue().value;
+    return maxTree().value;
   }
 
   BinaryTree.prototype.delete = function (value) {
-    rootTree = deleteValue(value);
+    return deleteValue(value);
   }
 
   BinaryTree.prototype.clear = function () {
@@ -79,47 +79,44 @@
     return false;
   }
 
-  const minValue = (tree = rootTree) => {
+  const minTree = (tree = rootTree) => {
     if (tree.leftTree) {
-      return minValue(tree.leftTree);
+      return minTree(tree.leftTree);
     }
     return tree;
   }
 
-  const maxValue = (tree = rootTree) => {
+  const maxTree = (tree = rootTree) => {
     if (tree.rightTree) {
-      return maxValue(tree.rightTree);
+      return maxTree(tree.rightTree);
     }
     return tree;
   }
 
   const deleteValue = (v, tree = rootTree) => {
-    if (v === tree.value) {
-      let tempTree;
-      if (tree.leftTree) {
-        tempTree = findTree(v, tree.leftTree);
-      } else if (tree.rightTree) {
-        tempTree = findTree(v, tree.rightTree);
-      } else {
-        tree = {};
-      }
-      tree.value = tempTree.value;
-
-      if (tempTree.leftTree) return deleteValue(tempTree.value, tempTree.leftTree);
-      else if (tempTree.rightTree) return deleteValue(tempTree.value, tempTree.leftTree);
-
-      return tree;
-    }
+    if (v === tree.value) return promotionTree(tree);
     else if (v < tree.value && tree.leftTree) return deleteValue(v, tree.leftTree);
     else if (v > tree.value && tree.rightTree) return deleteValue(v, tree.rightTree);
-  }
 
-  const findTree = (v, tree = rootTree) => {
-    if (v === tree.value) return tree;
-    if (v < tree.value && tree.leftTree) return hasValue(v, tree.leftTree);
-    else if (v > tree.value && tree.rightTree) return hasValue(v, tree.rightTree);
+    // 没有匹配到
     return false;
   }
 
+  const promotionTree = tree => {
+    let tempTree;
+
+    if (tree.rightTree) {
+      tempTree = minTree(tree.rightTree);
+    } else if (tree.leftTree) {
+      tempTree = minTree(tree.leftTree);
+    } else {
+      delete tree.value;
+      console.log('ok');
+      return true;
+    }
+    tree.value = tempTree.value;
+    return promotionTree(tempTree);
+  }
+
   w.BinaryTree = BinaryTree;
-})(window)
+})(window);
