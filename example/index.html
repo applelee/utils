@@ -2,22 +2,32 @@
   <head>
     <script src="../libs/BinaryTree.js"></script>
     <script>
-      const arr = [8,55,12,75,0,12,1,8,2,33];
+      const arr = [8,55,0,12,1,2,33];
       const temp = [222,566,-12];
-      const binaryTree = new BinaryTree(arr);
-      console.log(binaryTree);
+      // 实例化
+      const bt = binarytree(arr);
       
-      temp.forEach(v => binaryTree.add(v));
-      console.log(binaryTree.rootTree);
-      console.log(binaryTree.min());
-      console.log(binaryTree.max());
-      console.log(binaryTree.has(725), binaryTree.has(8), binaryTree.has(55), binaryTree.has(1222));
-      console.log(binaryTree.delete(0));
-      console.log(binaryTree.rootTree);
+      temp.forEach(v => bt.add(v));
+      console.log(bt.rootTree);
+      console.log(bt.has(725), bt.has(8), bt.has(55), bt.has(1222));
+      console.log(bt.delete(0));
+      console.log(bt.delete(8));
+      console.log(bt.rootTree);
+      console.log(bt.min());
+      console.log(bt.max());
+
+      // 前序
+      console.log(bt.preorderTraversal());
+      // 中序（升序）
+      console.log(bt.inorderTraversalAsce());
+      // 中序（降序）
+      console.log(bt.inorderTraversalDesce());
+      // 中序
+      console.log(bt.postorderTraversal());
 
       // 清空二叉树
-      // binaryTree.clear();
-      // console.log(binaryTree.rootTree);
+      // bt.clear();
+      // console.log(bt.rootTree);
     </script>
   </head>
   <body>
