@@ -2,10 +2,6 @@
   // 树总集
   let rootTree;
 
-  const binaryTree = (array = []) => {
-    return new BinaryTree(array);
-  }
-
   // 空树构造函数
   const Tree = function () {
     // this.value;
@@ -177,5 +173,5 @@
     return result
   }
 
-  w.bt = w.binarytree = binaryTree;
+  w.bt = w.binarytree = (array = []) => new BinaryTree(array);
 })(window);
