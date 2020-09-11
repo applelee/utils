@@ -10,21 +10,46 @@
     <canvas id='cvs'></canvas>
 
     <script>
-      var screenW = screenH = 100;
+      var screenW = screenH = 300;
       var cvsDom = document.getElementById('cvs');
       var cvsContext = cvsDom.getContext('2d');
+      var pointers = [[50, 50], [170, 100], [290, 100], [250, 10], [10, 290], [150, 250], [33, 88]];
       cvsDom.width = screenW;
       cvsDom.height = screenH;
       
       // cvsContext.
       var sweepline = sweeplinefill({
-        screenSize: [screenW, screenH],
-        pointers: [[0, 0], [100, 0], [100, 100], [0, 100]],
+        screenHeight: screenH,
+        pointers,
       });
 
-      var fillData = sweepline.getSweepData();
+      // for (var n = 0; n < pointers.length; n ++) {
+      //   var v = pointers[n];
+      //   // 设置绘制颜色
+      //   cvsContext.fillStyle = "black";
+      //   // 绘制成矩形
+      //   cvsContext.fillRect(v[0] - 1, v[1] - 1, 1, 1);
+      // }
 
+      var fillData = sweepline.getSweepData();
       console.log(fillData);
+
+      var fillStart = a => {
+        if (a.length <= 0) return;
+        var line = a.shift();
+        var [s, e] = line;
+
+        cvsContext.moveTo(s[0], s[1]);
+        cvsContext.lineTo(e[0], e[1]);
+        cvsContext.strokeStyle = 'red';
+        cvsContext.stroke();
+
+        setTimeout(() => {
+          fillStart(a);
+        });
+      }
+
+      fillStart(fillData);
     </script>
   </body>
 </html>
