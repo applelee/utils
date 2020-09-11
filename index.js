@@ -194,3 +194,25 @@ export const Co = generator => {
 export const randomNum = () => {
   return (Math.random() * (1 << 30)) << 0;
 };
+
+/**
+ * 
+ * 插入排序
+ * @returns {array} array
+ */
+const insertSort = a => {
+  const len = a.length;
+
+  for (let i = 0; i < len; i ++) {
+    let j = i + 1
+    const value = a[j]
+
+    while (a[j - 1] > value && j >= 0) {
+      const temp = a[j - 1];
+      a[j - 1] = value;
+      a[j] = temp;
+      j --;
+    }
+  }
+  return a
+}

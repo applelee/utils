@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <script src="../libs/SweepLineFill.js"></script>
+    <style>
+      body{display: flex;justify-content: center;align-items: center;}
+      #cvs{border: 1px solid #333;}
+    </style>
+  </head>
+  <body>
+    <canvas id='cvs'></canvas>
+
+    <script>
+      var screenW = screenH = 100;
+      var cvsDom = document.getElementById('cvs');
+      var cvsContext = cvsDom.getContext('2d');
+      cvsDom.width = screenW;
+      cvsDom.height = screenH;
+      
+      // cvsContext.
+      var sweepline = sweeplinefill({
+        screenSize: [screenW, screenH],
+        pointers: [[0, 0], [100, 0], [100, 100], [0, 100]],
+      });
+
+      var fillData = sweepline.getSweepData();
+
+      console.log(fillData);
+    </script>
+  </body>
+</html>
