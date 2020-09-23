@@ -227,7 +227,7 @@ const deepCopy = (m, o) => {
     if (typeof m[i] === 'object') {
       o[i] = deepCopy(m[i], o[i])
     } else {
-      o[i] = m[i]
+      o[i] = o[i] || m[i]
     }
   }
   return o
