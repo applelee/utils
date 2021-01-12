@@ -216,3 +216,19 @@ const insertSort = a => {
   }
   return a
 }
+
+/**
+ * 
+ * 深拷贝
+ * @returns {array} array
+ */
+const deepCopy = (m, o) => {
+  for (i in m) {
+    if (typeof m[i] === 'object') {
+      o[i] = deepCopy(m[i], o[i])
+    } else {
+      o[i] = o[i] || m[i]
+    }
+  }
+  return o
+}

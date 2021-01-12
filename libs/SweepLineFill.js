@@ -1,11 +1,11 @@
 (function (w) {
   let options = {
-    screenSize: [100, 100],
-    pointers: [[0, 0], [100, 0], [100, 100], [0, 100]],
+    screenHeight: 100,
+    pointers: [],
   }
 
   // 私有变量
-  let screenSize, pointers;
+  let screenHeight, pointers;
   let sweepRow = 0;
   let lineMap = new Map();
   let lineQueue = [];
@@ -34,7 +34,7 @@
       ...opt,
     }
 
-    screenSize = options.screenSize;
+    screenHeight = options.screenHeight;
     pointers = options.pointers;
 
     sweepRow = 0;
@@ -44,19 +44,21 @@
 
   // 扫描递归
   const sweepHandle = () => {
-    const [, height] = screenSize;
-    if (sweepRow >= height) return;
+    if (sweepRow > screenHeight) return;
 
     inlineOperation();
+
+    // setTimeout(() => {
     sweepRow += 1;
     sweepHandle();
+    // });
   }
 
   // 行内检测
   const inlineOperation  = () => {
     const lineDatas = lineMap.get(sweepRow);
 
-    // deleteLineQueueMember();
+    deleteLineQueueMember();
     updateLineRenderDatas();
 
     // 是否有线段
@@ -64,9 +66,7 @@
 
     // 取出数据后，立即从原表中删除
     lineMap.delete(sweepRow);
-
-    const values = Object.values(lineDatas);
-    insertLineQueue(values);
+    insertLineQueue(lineDatas);
   }
 
   // 创建线段表
@@ -79,12 +79,12 @@
       const tempLine = lineDirction(v1, v2);
 
       if (tempLine) {
-        const tempData = lineMap.get(tempLine.sY) || {};
+        const tempData = lineMap.get(tempLine.sY) || [];
 
-        lineMap.set(tempLine.sY, {
+        lineMap.set(tempLine.sY, [
           ...tempData,
-          [vectorTransformString([tempLine.sX, tempLine.sY])]: tempLine,
-        });
+          tempLine,
+        ]);
       }
     }
   }
@@ -93,7 +93,7 @@
   const lineDirction = (v1, v2) => {
     const [x1, y1] = v1;
     const [x2, y2] = v2;
-    const slope = Math.abs((y2 - y1) / (x2 - x1));
+    const slope = (y2 - y1) / (x2 - x1);
 
     if (y1 > y2) return {
       slope,
@@ -112,7 +112,7 @@
   // 删除线队列中的成员
   const deleteLineQueueMember = () => {
     lineQueue = lineQueue.filter(v => {
-      return v.eY < sweepRow;
+      return v.eY >= sweepRow;
     })
   }
 
@@ -168,14 +168,11 @@
   
   // 获取焦点
   const getFocus = line => {
-    const { slope, sX } = line;
+    const { slope, sX, sY } = line;
 
     if (slope === Infinity) return [sX, sweepRow];
-    return [sX * slope, sweepRow];
+    return [sX + (sweepRow - sY) / slope, sweepRow];
   }
-
-  // 矢量转换成字符串
-  const vectorTransformString = ([x, y]) => `${x}_${y}`;
 
   w.sweeplinefill = (opt = {}) => new SweepLineFill(opt);
 })(window);
